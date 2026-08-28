@@ -6,7 +6,7 @@ import arff
 
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
 
 from sklearn.metrics import (
     mean_absolute_error,
@@ -84,7 +84,10 @@ model = Pipeline(
         ),
         (
             "model",
-            LinearRegression()
+            DecisionTreeRegressor(
+                max_depth=5,
+                random_state=42
+            )
         )
     ]
 )
@@ -114,7 +117,7 @@ Path("results").mkdir(
 
 
 error_analysis.to_excel(
-    "results/linear_regression/all_predictions.xlsx",
+    "results/decision_tree/all_predictions.xlsx",
     index=False,
     engine="openpyxl"
 )
@@ -123,7 +126,7 @@ error_analysis.sort_values(
     by="Absolute_Error",
     ascending=False
 ).head(20).to_excel(
-    "results/linear_regression/worst_predictions.xlsx",
+    "results/decision_tree/worst_predictions.xlsx",
     index=False,
     engine="openpyxl"
 )
@@ -135,7 +138,7 @@ neighborhood_report = evaluate_group(
 )
 
 neighborhood_report.to_excel(
-    "results/linear_regression/neighborhood_error_report.xlsx",
+    "results/decision_tree/neighborhood_error_report.xlsx",
     engine="openpyxl"
 )
 
@@ -146,13 +149,13 @@ quality_report = evaluate_group(
 )
 
 quality_report.to_excel(
-    "results/linear_regression/quality_error_report.xlsx",
+    "results/decision_tree/quality_error_report.xlsx",
     engine="openpyxl"
 )
 
-
 plot_actual_prediction(
-    error_analysis
+    error_analysis,
+    "results/decision_tree/actual_vs_prediction.png"
 )
 
 

@@ -87,7 +87,7 @@ def evaluate_group(
 
 
 
-def plot_actual_prediction(data):
+def plot_actual_prediction(data, output_path):
 
     plt.figure(
         figsize=(8,6)
@@ -97,7 +97,6 @@ def plot_actual_prediction(data):
         data["Actual"],
         data["Prediction"]
     )
-
 
     min_value = min(
         data["Actual"].min(),
@@ -109,12 +108,10 @@ def plot_actual_prediction(data):
         data["Prediction"].max()
     )
 
-
     plt.plot(
-        [min_value,max_value],
-        [min_value,max_value]
+        [min_value, max_value],
+        [min_value, max_value]
     )
-
 
     plt.xlabel(
         "Actual Price"
@@ -128,10 +125,14 @@ def plot_actual_prediction(data):
         "Actual vs Prediction"
     )
 
-
     plt.savefig(
-        "results/actual_vs_prediction.png",
+        output_path,
         bbox_inches="tight"
     )
 
     plt.close()
+
+
+
+
+   
