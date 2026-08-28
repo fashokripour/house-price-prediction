@@ -1,0 +1,2 @@
+	model	preprocessing	MAE	RMSE	R2
+1	Linear Regression	Numerical + OneHot + Ordinal Encoding	19133.03	29286.41	0.8634
