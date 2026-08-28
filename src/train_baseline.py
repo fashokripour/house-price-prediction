@@ -15,7 +15,11 @@ from sklearn.metrics import (
 
 from src.preprocessing import preprocessor
 from src.validate_data import validate_dataset
-
+from src.error_analysis import (
+    create_error_analysis,
+    evaluate_group,
+    plot_actual_prediction
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -97,6 +101,61 @@ model.fit(
 
 val_prediction = model.predict(X_val)
 
+error_analysis = create_error_analysis(
+    X_val,
+    y_val,
+    val_prediction
+)
+
+Path("results").mkdir(
+    exist_ok=True
+)
+
+
+error_analysis.to_excel(
+    "results/all_predictions.xlsx",
+    index=False,
+    engine="openpyxl"
+)
+
+error_analysis.sort_values(
+    by="Absolute_Error",
+    ascending=False
+).head(20).to_excel(
+    "results/worst_predictions.xlsx",
+    index=False,
+    engine="openpyxl"
+)
+
+
+neighborhood_report = evaluate_group(
+    error_analysis,
+    "Neighborhood"
+)
+
+neighborhood_report.to_excel(
+    "results/neighborhood_error_report.xlsx",
+    engine="openpyxl"
+)
+
+
+quality_report = evaluate_group(
+    error_analysis,
+    "OverallQual"
+)
+
+quality_report.to_excel(
+    "results/quality_error_report.xlsx",
+    engine="openpyxl"
+)
+
+
+plot_actual_prediction(
+    error_analysis
+)
+
+
+print("Error analysis completed")
 
 val_mae = mean_absolute_error(
     y_val,
@@ -115,9 +174,18 @@ val_r2 = r2_score(
     val_prediction
 )
 
+val_mape = (
+    np.abs(
+        (y_val - val_prediction)
+        /
+        y_val
+    ).mean()
+    * 100
+)
 
 print("\nValidation Results")
 print("------------------")
 print(f"MAE: {val_mae:.2f}")
 print(f"RMSE: {val_rmse:.2f}")
 print(f"R2: {val_r2:.4f}")
+print(f"MAPE: {val_mape:.2f}%")
