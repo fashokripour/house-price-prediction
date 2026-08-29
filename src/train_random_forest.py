@@ -1,5 +1,6 @@
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestRegressor
+import pandas as pd
 
 from src.preprocessing import preprocessor
 
@@ -20,10 +21,7 @@ from src.error_analysis import (
 
 df = load_dataset()
 
-
 X, y = prepare_features(df)
-
-
 
 (
     X_train,
@@ -48,7 +46,8 @@ model = Pipeline(
         (
             "model",
             RandomForestRegressor(
-                n_estimators=100,
+                n_estimators=200,
+                max_depth=10,
                 random_state=42
             )
         )
@@ -62,7 +61,42 @@ model.fit(
     y_train
 )
 
+feature_names = (
+    model
+    .named_steps["preprocessor"]
+    .get_feature_names_out()
+)
 
+
+importances = (
+    model
+    .named_steps["model"]
+    .feature_importances_
+)
+
+
+importance_df = pd.DataFrame(
+    {
+        "Feature": feature_names,
+        "Importance": importances
+    }
+)
+
+
+importance_df = importance_df.sort_values(
+    by="Importance",
+    ascending=False
+)
+
+
+print(
+    importance_df.head(20)
+)
+
+importance_df.to_csv(
+    "results/random_forest/feature_importance.csv",
+    index=False
+)
 
 val_prediction = model.predict(
     X_val
