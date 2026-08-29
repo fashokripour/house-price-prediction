@@ -124,15 +124,71 @@ def plot_actual_prediction(data, output_path):
     plt.title(
         "Actual vs Prediction"
     )
-
+    
     plt.savefig(
         output_path,
         bbox_inches="tight"
     )
-
+    
     plt.close()
 
+def save_error_analysis(
+    data,
+    output_dir
+):
 
+    output_dir = Path(output_dir)
+
+    output_dir.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+
+    data.to_excel(
+        output_dir / "all_predictions.xlsx",
+        index=False,
+        engine="openpyxl"
+    )
+
+
+    data.sort_values(
+        by="Absolute_Error",
+        ascending=False
+    ).head(20).to_excel(
+        output_dir / "worst_predictions.xlsx",
+        index=False,
+        engine="openpyxl"
+    )
+
+
+    neighborhood_report = evaluate_group(
+        data,
+        "Neighborhood"
+    )
+
+
+    neighborhood_report.to_excel(
+        output_dir / "neighborhood_error_report.xlsx",
+        engine="openpyxl"
+    )
+
+
+    quality_report = evaluate_group(
+        data,
+        "OverallQual"
+    )
+
+
+    quality_report.to_excel(
+        output_dir / "quality_error_report.xlsx",
+        engine="openpyxl"
+    )
+
+    plot_actual_prediction(
+        data,
+        output_dir / "actual_vs_prediction.png"
+    )
 
 
    

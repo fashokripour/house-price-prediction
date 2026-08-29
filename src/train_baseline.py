@@ -1,78 +1,40 @@
-import pandas as pd
-import numpy as np
-from pathlib import Path
-import matplotlib.pyplot as plt
-import arff
-
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LinearRegression
 
-from sklearn.metrics import (
-    mean_absolute_error,
-    mean_squared_error,
-    r2_score
+from src.preprocessing import preprocessor
+
+from src.utils import (
+    load_dataset,
+    prepare_features,
+    split_data,
+    calculate_metrics
 )
 
-from src.preprocessing import preprocessor
-from src.validate_data import validate_dataset
 from src.error_analysis import (
     create_error_analysis,
-    evaluate_group,
-    plot_actual_prediction
+    plot_actual_prediction,
+    save_error_analysis
 )
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-DATA_PATH = PROJECT_ROOT / "data" / "dataset.arff"
-
-
-with open(DATA_PATH, "r") as file:
-    dataset = arff.load(file)
+df = load_dataset()
 
 
-df = pd.DataFrame(
-    dataset["data"],
-    columns=[
-        attribute[0]
-        for attribute in dataset["attributes"]
-    ]
-)
-
-validate_dataset(df)
-
-X = df.drop(
-    columns=[
-        "SalePrice",
-        "Id"
-    ]
-)
-
-y = df["SalePrice"]
+X, y = prepare_features(df)
 
 
-# Train / Validation / Test split
-
-X_train, X_temp, y_train, y_temp = train_test_split(
+(
+    X_train,
+    X_val,
+    X_test,
+    y_train,
+    y_val,
+    y_test
+) = split_data(
     X,
-    y,
-    test_size=0.3,
-    random_state=42
+    y
 )
-
-
-X_val, X_test, y_val, y_test = train_test_split(
-    X_temp,
-    y_temp,
-    test_size=0.5,
-    random_state=42
-)
-
-
-print("Train:", X_train.shape)
-print("Validation:", X_val.shape)
-print("Test:", X_test.shape)
 
 
 
@@ -90,7 +52,6 @@ model = Pipeline(
 )
 
 
-# Train
 
 model.fit(
     X_train,
@@ -98,9 +59,35 @@ model.fit(
 )
 
 
-# Validation evaluation
 
-val_prediction = model.predict(X_val)
+val_prediction = model.predict(
+    X_val
+)
+
+
+
+metrics = calculate_metrics(
+    y_val,
+    val_prediction
+)
+
+
+print("\nValidation Results")
+print("------------------")
+
+for key, value in metrics.items():
+
+    if key == "R2":
+        print(
+            f"{key}: {value:.4f}"
+        )
+
+    else:
+        print(
+            f"{key}: {value:.2f}"
+        )
+
+
 
 error_analysis = create_error_analysis(
     X_val,
@@ -108,85 +95,7 @@ error_analysis = create_error_analysis(
     val_prediction
 )
 
-Path("results").mkdir(
-    exist_ok=True
-)
-
-
-error_analysis.to_excel(
-    "results/linear_regression/all_predictions.xlsx",
-    index=False,
-    engine="openpyxl"
-)
-
-error_analysis.sort_values(
-    by="Absolute_Error",
-    ascending=False
-).head(20).to_excel(
-    "results/linear_regression/worst_predictions.xlsx",
-    index=False,
-    engine="openpyxl"
-)
-
-
-neighborhood_report = evaluate_group(
+save_error_analysis(
     error_analysis,
-    "Neighborhood"
+    "results/linear_regression"
 )
-
-neighborhood_report.to_excel(
-    "results/linear_regression/neighborhood_error_report.xlsx",
-    engine="openpyxl"
-)
-
-
-quality_report = evaluate_group(
-    error_analysis,
-    "OverallQual"
-)
-
-quality_report.to_excel(
-    "results/linear_regression/quality_error_report.xlsx",
-    engine="openpyxl"
-)
-
-
-plot_actual_prediction(
-    error_analysis
-)
-
-
-print("Error analysis completed")
-
-val_mae = mean_absolute_error(
-    y_val,
-    val_prediction
-)
-
-val_rmse = np.sqrt(
-    mean_squared_error(
-        y_val,
-        val_prediction
-    )
-)
-
-val_r2 = r2_score(
-    y_val,
-    val_prediction
-)
-
-val_mape = (
-    np.abs(
-        (y_val - val_prediction)
-        /
-        y_val
-    ).mean()
-    * 100
-)
-
-print("\nValidation Results")
-print("------------------")
-print(f"MAE: {val_mae:.2f}")
-print(f"RMSE: {val_rmse:.2f}")
-print(f"R2: {val_r2:.4f}")
-print(f"MAPE: {val_mape:.2f}%")

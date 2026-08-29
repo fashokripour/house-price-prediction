@@ -1,5 +1,5 @@
 from sklearn.pipeline import Pipeline
-from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
 
 from src.preprocessing import preprocessor
 
@@ -47,8 +47,8 @@ model = Pipeline(
         ),
         (
             "model",
-            DecisionTreeRegressor(
-                max_depth=5,
+            RandomForestRegressor(
+                n_estimators=100,
                 random_state=42
             )
         )
@@ -103,5 +103,5 @@ error_analysis = create_error_analysis(
 
 save_error_analysis(
     error_analysis,
-    "results/decision_tree"
+    "results/random_forest"
 )
