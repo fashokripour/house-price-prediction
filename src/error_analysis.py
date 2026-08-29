@@ -191,4 +191,60 @@ def save_error_analysis(
     )
 
 
-   
+def evaluate_price_ranges(data):
+
+    bins = [
+        0,
+        100000,
+        200000,
+        400000,
+        float("inf")
+    ]
+
+    labels = [
+        "<100k",
+        "100k-200k",
+        "200k-400k",
+        ">400k"
+    ]
+
+    data = data.copy()
+
+    data["Price_Range"] = pd.cut(
+        data["Actual"],
+        bins=bins,
+        labels=labels
+    )
+
+
+    result = (
+        data
+        .groupby("Price_Range", observed=False)
+        .apply(
+            lambda x: pd.Series(
+                {
+                    "Count": len(x),
+
+                    "Average_Price":
+                    x["Actual"].mean(),
+
+                    "MAE":
+                    mean_absolute_error(
+                        x["Actual"],
+                        x["Prediction"]
+                    ),
+
+                    "RMSE":
+                    mean_squared_error(
+                        x["Actual"],
+                        x["Prediction"]
+                    ) ** 0.5,
+
+                    "MAPE":
+                    x["Percentage_Error"].mean()
+                }
+            )
+        )
+    )
+
+    return result

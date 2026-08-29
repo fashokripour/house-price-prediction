@@ -1,5 +1,6 @@
 from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import GradientBoostingRegressor
+import pandas as pd
 
 from src.preprocessing import preprocessor
 
@@ -21,9 +22,7 @@ from src.error_analysis import (
 
 df = load_dataset()
 
-
 X, y = prepare_features(df)
-
 
 (
     X_train,
@@ -47,7 +46,12 @@ model = Pipeline(
         ),
         (
             "model",
-            LinearRegression()
+            GradientBoostingRegressor(
+                n_estimators=500,
+                learning_rate=0.05,
+                max_depth=4,
+                random_state=42
+            )
         )
     ]
 )
@@ -59,7 +63,42 @@ model.fit(
     y_train
 )
 
+feature_names = (
+    model
+    .named_steps["preprocessor"]
+    .get_feature_names_out()
+)
 
+
+importances = (
+    model
+    .named_steps["model"]
+    .feature_importances_
+)
+
+
+importance_df = pd.DataFrame(
+    {
+        "Feature": feature_names,
+        "Importance": importances
+    }
+)
+
+
+importance_df = importance_df.sort_values(
+    by="Importance",
+    ascending=False
+)
+
+
+print(
+    importance_df.head(20)
+)
+
+importance_df.to_csv(
+    "results/random_forest/feature_importance.csv",
+    index=False
+)
 
 val_prediction = model.predict(
     X_val
@@ -71,6 +110,7 @@ metrics = calculate_metrics(
     y_val,
     val_prediction
 )
+
 
 
 print("\nValidation Results")
@@ -96,9 +136,10 @@ error_analysis = create_error_analysis(
     val_prediction
 )
 
+
 save_error_analysis(
     error_analysis,
-    "results/linear_regression"
+    "results/GradientBoostingRegressor"
 )
 
 price_analysis = evaluate_price_ranges(
