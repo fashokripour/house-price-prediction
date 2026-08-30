@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 from sklearn.pipeline import Pipeline
-from sklearn.linear_model import Ridge
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import StratifiedKFold
 from sklearn.base import clone
 
@@ -33,11 +33,9 @@ X, y = prepare_features(df)
 )
 
 
-# =========================================
 # Development data
 # Train + Validation
 # Test remains untouched
-# =========================================
 
 X_dev = pd.concat(
     [X_train, X_val],
@@ -49,10 +47,7 @@ y_dev = pd.concat(
     axis=0
 ).reset_index(drop=True)
 
-
-# =========================================
 # Create price groups only for stratification
-# =========================================
 
 price_bins = pd.cut(
     y_dev,
@@ -81,9 +76,7 @@ print(
 )
 
 
-# =========================================
 # Stratified 5-Fold
-# =========================================
 
 skf = StratifiedKFold(
     n_splits=5,
@@ -94,10 +87,7 @@ skf = StratifiedKFold(
 
 fold_results = []
 
-
-# =========================================
 # Cross Validation
-# =========================================
 
 for fold, (train_index, val_index) in enumerate(
     skf.split(
@@ -123,10 +113,7 @@ for fold, (train_index, val_index) in enumerate(
         val_index
     ]
 
-
-    # -------------------------------------
     # Show price distribution in each fold
-    # -------------------------------------
 
     fold_price_bins = pd.cut(
         y_fold_val,
@@ -155,10 +142,7 @@ for fold, (train_index, val_index) in enumerate(
         fold_price_bins.value_counts().sort_index()
     )
 
-
-    # -------------------------------------
     # Fresh model for every fold
-    # -------------------------------------
 
     model = Pipeline(
         steps=[
@@ -168,36 +152,30 @@ for fold, (train_index, val_index) in enumerate(
             ),
             (
                 "model",
-                Ridge(
-                    alpha=100
+                GradientBoostingRegressor(
+                    n_estimators=500,
+                    learning_rate=0.05,
+                    max_depth=4,
+                    random_state=42
                 )
             )
         ]
     )
 
-
-    # -------------------------------------
     # Log target
-    # -------------------------------------
 
     y_fold_train_log = np.log1p(
         y_fold_train
     )
 
-
-    # -------------------------------------
     # Train
-    # -------------------------------------
 
     model.fit(
         X_fold_train,
         y_fold_train_log
     )
 
-
-    # -------------------------------------
     # Predict
-    # -------------------------------------
 
     prediction_log = model.predict(
         X_fold_val
