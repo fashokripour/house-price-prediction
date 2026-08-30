@@ -94,7 +94,7 @@ error_analysis = create_error_analysis(
 
 save_error_analysis(
     error_analysis,
-    "results/Ridge"
+    "results/ridge"
 )
 
 price_analysis = evaluate_price_ranges(

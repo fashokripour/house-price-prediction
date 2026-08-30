@@ -96,7 +96,7 @@ print(
 )
 
 importance_df.to_csv(
-    "results/random_forest/feature_importance.csv",
+    "results/gradiant_boosting/feature_importance.csv",
     index=False
 )
 
@@ -139,7 +139,7 @@ error_analysis = create_error_analysis(
 
 save_error_analysis(
     error_analysis,
-    "results/GradientBoostingRegressor"
+    "results/gradient_boosting"
 )
 
 price_analysis = evaluate_price_ranges(

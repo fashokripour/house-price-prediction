@@ -1,0 +1,32 @@
+Model,Configuration,Evaluation,MAE,RMSE,R2,MAPE_percent
+Linear Regression,Baseline,Validation,19133.03,29286.41,0.8634,
+Decision Tree,Default,Validation,30640.38,48791.94,0.621,17.62
+Decision Tree,Tuned run 1,Validation,25706.77,37347.69,0.7779,15.5
+Decision Tree,Tuned run 2,Validation,27326.29,42105.89,0.7177,16.43
+Decision Tree,Tuned run 3,Validation,26995.6,40844.73,0.7344,15.63
+Decision Tree,max_depth=3,Validation,28382.2,38932.36,0.7587,18.32
+Random Forest,Baseline,Validation,16729.35,25111.07,0.8996,10.44
+Random Forest,n_estimators=200; max_depth=10,Validation,15982.33,24179.7,0.9069,10.11
+Random Forest,"n_estimators=300; max_depth=10; max_features=""sqrt""",Validation,17151.71,25960.09,0.8927,11.3
+Random Forest,n_estimators=200; max_depth=10; min_samples_leaf=5,Validation,16369.29,24205.55,0.9067,10.38
+Random Forest,n_estimators=500; max_depth=10,Validation,16162.34,24430.33,0.905,10.17
+Gradient Boosting,n=100; lr=0.1; depth=3,Validation,16552.54,24014.58,0.9082,10.17
+Gradient Boosting,n=300; lr=0.05; depth=3,Validation,16077.57,24142.81,0.9072,9.77
+Gradient Boosting,n=200; lr=0.1; depth=4,Validation,16004.12,23264.11,0.9138,10.04
+Gradient Boosting,depth=5,Validation,16712.29,24217.38,0.9066,10.22
+Gradient Boosting,n=300; lr=0.1; depth=4,Validation,15979.27,23300.8,0.9136,10.03
+Gradient Boosting,n=300; lr=0.05; depth=4,Validation,15842.15,23368.94,0.9131,9.85
+Gradient Boosting,n=500; lr=0.05; depth=4,Validation,15660.0,23123.78,0.9149,9.78
+Gradient Boosting,n=700; lr=0.05; depth=4,Validation,18406.91,28719.96,0.8687,11.5
+Ridge,alpha=1; original preprocessing,Validation,18684.73,26139.82,0.8912,11.56
+Ridge,alpha=1; scaled preprocessing,Validation,18914.42,27333.6,0.8811,11.7
+Ridge,alpha=0.1; scaled preprocessing,Validation,19030.37,29301.21,0.8633,11.68
+Ridge,alpha=10; scaled preprocessing,Validation,18310.03,25826.76,0.8938,11.58
+Ridge,alpha=100; scaled preprocessing,Validation,17223.21,25143.54,0.8993,10.5
+Ridge,alpha=200; scaled preprocessing; log target,Validation,15852.46,22538.25,0.9191,10.02
+Ridge,alpha=100; scaled preprocessing; log target,Validation,15457.49,21952.28,0.9233,9.75
+Gradient Boosting,n=500; lr=0.05; depth=4; train+validation,Final Test,14856.23,24121.65,0.9235,8.44
+Decision Tree — Mean,Mean of 5 recorded validation experiments,Validation Summary,27810.248000000003,41604.522,0.72194,16.7
+Random Forest — Mean,Mean of 5 recorded validation experiments,Validation Summary,16479.003999999997,24777.348,0.9021800000000001,10.48
+Gradient Boosting — Mean,Mean of 8 recorded validation experiments,Validation Summary,16404.35625,24269.045,0.9057625,10.169999999999998
+Ridge — Mean,Mean of 7 recorded validation experiments,Validation Summary,17638.958571428568,25462.20857142857,0.8958714285714287,10.969999999999999
