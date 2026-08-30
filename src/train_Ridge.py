@@ -35,14 +35,6 @@ X, y = prepare_features(df)
     y
 )
 
-print("Total train:", len(y_train))
-
-train_analysis = X_train.copy()
-train_analysis["SalePrice"] = y_train
-
-print(train_analysis.shape)
-
-
 model = Pipeline(
     steps=[
         (
